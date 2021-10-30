@@ -1,9 +1,10 @@
 import styled from "@emotion/styled";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Button, RoundButton } from "../components/Buttons";
-import { setGameMap, toggleMax } from "../data/settingsSlice";
+import { InfoCard } from "../components/InfoCard";
+import { setGameMap, setScore, toggleMax } from "../data/settingsSlice";
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,6 +22,7 @@ const Container = styled.div`
   width: 100vw;
   max-width: 1110px;
   padding-top: 65px;
+  padding-bottom: 65px;
 
   h1 {
     color: ${({ theme }) => theme.colors.black};
@@ -49,11 +51,22 @@ const TopButtons = styled.div`
   }
 `;
 
+const ScoreContainer = styled.div`
+  display: flex;
+  width: ${({ size }) => (size ? size : "532px")};
+  height: 140px;
+
+  align-items: center;
+  justify-content: space-between;
+`;
+
 export default function Game() {
   const grid = useSelector((state) => state.settings.grid);
   const gameMap = useSelector((state) => state.settings.gameMap);
+  const score = useSelector((state) => state.settings.score);
   const dispatch = useDispatch();
   const history = useHistory();
+  const [registry, setRegistry] = useState([]);
   const [active, setActive] = useState([]);
 
   /**
@@ -78,8 +91,7 @@ export default function Game() {
     return array;
   }
 
-  // Build our starting game grid.
-  useEffect(() => {
+  const PopulateGrid = useCallback(() => {
     let count = 0;
     const rows = grid ? 6 : 4;
     let tempGameMap = [];
@@ -108,6 +120,11 @@ export default function Game() {
     );
   }, [grid, dispatch]);
 
+  // Build our starting game grid.
+  useEffect(() => {
+    PopulateGrid();
+  }, [PopulateGrid]);
+
   useEffect(() => {
     if (active && active.length >= 2) {
       dispatch(toggleMax());
@@ -116,15 +133,21 @@ export default function Game() {
         if (active[0].value !== active[1].value) {
           active.forEach((button) => button.act(false));
           setActive([]);
-          dispatch(toggleMax());
+          return dispatch(toggleMax());
         }
 
         // Match!
-        if (active[0].value === active[1].value) {
+        if (
+          active[0].value === active[1].value &&
+          active[0].idx !== active[1].idx
+        ) {
           active.forEach((button) => {
             button.mat(true);
             button.act(false);
           });
+          setActive([]);
+          dispatch(toggleMax());
+        } else {
           setActive([]);
           dispatch(toggleMax());
         }
@@ -138,7 +161,18 @@ export default function Game() {
         <Nav>
           <Title>memory</Title>
           <TopButtons>
-            <Button primary variant>
+            <Button
+              primary
+              variant
+              onClick={() => {
+                registry.forEach((button) => {
+                  button.mat(false);
+                  button.act(false);
+                });
+                setActive([]);
+                setTimeout(() => PopulateGrid(), 200);
+              }}
+            >
               restart
             </Button>
             <Button variant onClick={() => history.push("/")}>
@@ -155,10 +189,10 @@ export default function Game() {
                   key={idx}
                   active={item.active}
                   onClick={(act, mat) => {
-                    setActive([
-                      ...active,
-                      { idx, act, mat, value: item.value },
-                    ]);
+                    dispatch(setScore(score + 1));
+                    const entry = { idx, act, mat, value: item.value };
+                    setRegistry([...new Set([...registry, entry])]);
+                    setActive([...active, entry]);
                   }}
                 >
                   {item.value}
@@ -166,6 +200,10 @@ export default function Game() {
               );
             })}
         </GameContainer>
+        <ScoreContainer>
+          <InfoCard text="Time">1:30</InfoCard>
+          <InfoCard text="moves">{score}</InfoCard>
+        </ScoreContainer>
       </Container>
     </Wrapper>
   );

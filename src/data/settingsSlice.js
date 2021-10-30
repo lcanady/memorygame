@@ -7,6 +7,7 @@ const initialState = {
   started: false,
   gameMap: [],
   max: false,
+  score: 0,
 };
 
 export const settingsSlice = createSlice({
@@ -32,10 +33,14 @@ export const settingsSlice = createSlice({
     setGameMap: (state, { payload }) => {
       state.gameMap = payload;
     },
+    setScore: (state, { payload }) => {
+      state.score = payload;
+    },
   },
 });
 
 export const {
+  setScore,
   toggleMax,
   setGameMap,
   toggleTheme,
