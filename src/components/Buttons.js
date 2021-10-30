@@ -1,8 +1,10 @@
 import styled from "@emotion/styled";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export const Button = styled.button`
   padding: 0 24px;
-  height: ${({ primary }) => (primary ? "72px" : "52px")};
+  height: ${({ primary, variant }) => (primary && !variant ? "72px" : "52px")};
   border: none;
   outline: none;
   font-size: 26px;
@@ -29,11 +31,11 @@ export const Button = styled.button`
   }
 
   // Determine text color.
-  color: ${({ theme, secondary, state = "" }) => {
+  color: ${({ theme, secondary, primary, variant, state = "" }) => {
     if (secondary && state.toLowerCase() === "idle") {
       return theme.colors.black;
     }
-    return theme.colors.white;
+    return variant && !primary ? theme.colors.black : theme.colors.white;
   }};
 
   max-width: 100%;
@@ -46,6 +48,66 @@ export const Button = styled.button`
   min-width: 119px;
   border-radius: 35px;
 `;
+
+export const BaseRoundButton = styled.button`
+  height: ${({ size }) => (size ? size : "118px")};
+  width: ${({ size }) => (size ? size : "118px")};
+
+  border-radius: 59px;
+  outline: none;
+  border: none;
+  font-size: 44px;
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.5s, color 0.2s;
+
+  background-color: ${({ active, matched, theme }) => {
+    if (active) return theme.colors.primary;
+    if (matched) return theme.colors.idle;
+    return theme.colors.black;
+  }};
+
+  color: ${({ active, matched, theme }) => {
+    if (active || matched) return "rgba(252, 252, 252, 1)";
+    return "rgba(252, 252, 252, 0)";
+  }};
+
+  &:hover {
+    background-color: ${({ active, matched, theme }) => {
+      if (!active && !matched) return theme.colors.hover;
+    }};
+  }
+`;
+
+export function RoundButton({
+  children,
+  matched,
+  active,
+  idx,
+  onClick = () => {},
+  ...rest
+}) {
+  const [act, setActive] = useState(active);
+  const [match, setMatch] = useState(matched);
+  const max = useSelector((state) => state.settings.max);
+
+  return (
+    <BaseRoundButton
+      matched={match}
+      active={act}
+      onClick={() => {
+        if (!max && !match) {
+          setActive(!act);
+          onClick(setActive, setMatch);
+        }
+      }}
+      {...rest}
+    >
+      {children}
+    </BaseRoundButton>
+  );
+}
 
 const Wrapper = styled.div`
   display: flex;
