@@ -2,6 +2,8 @@
   "name": "memorygame",
   "version": "0.1.0",
   "private": true,
+  "author": "Lemuel L. Canady, Jr.",
+  "description": "A Javascript based multipalyer memory-match game!",
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
