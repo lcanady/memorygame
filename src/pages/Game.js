@@ -229,6 +229,7 @@ export default function Game() {
                   active={item.active}
                   matched={item.matched}
                   onClick={() => {
+                    dispatch(setPauseClock(false));
                     dispatch(
                       setGameMap(
                         gameMap.map((token, i) => {
