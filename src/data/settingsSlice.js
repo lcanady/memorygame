@@ -8,6 +8,8 @@ const initialState = {
   gameMap: [],
   max: false,
   score: 0,
+  clock: 0,
+  pauseClock: true,
 };
 
 export const settingsSlice = createSlice({
@@ -17,8 +19,8 @@ export const settingsSlice = createSlice({
     toggleTheme: (state) => {
       state.theme = !state.theme;
     },
-    toggleMax: (state) => {
-      state.max = !state.max;
+    toggleMax: (state, { payload }) => {
+      state.max = payload ? true : false;
     },
     toggleGrid: (state) => {
       state.grid = !state.grid;
@@ -36,10 +38,18 @@ export const settingsSlice = createSlice({
     setScore: (state, { payload }) => {
       state.score = payload;
     },
+    setClock: (state, { payload }) => {
+      state.clock = payload;
+    },
+    setPauseClock: (state, { payload }) => {
+      state.pauseClock = payload;
+    },
   },
 });
 
 export const {
+  setPauseClock,
+  setClock,
   setScore,
   toggleMax,
   setGameMap,

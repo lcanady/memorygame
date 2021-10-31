@@ -1,6 +1,4 @@
 import styled from "@emotion/styled";
-import { useState } from "react";
-import { useSelector } from "react-redux";
 
 export const Button = styled.button`
   padding: 0 24px;
@@ -88,20 +86,11 @@ export function RoundButton({
   onClick = () => {},
   ...rest
 }) {
-  const [act, setActive] = useState(active);
-  const [match, setMatch] = useState(matched);
-  const max = useSelector((state) => state.settings.max);
-
   return (
     <BaseRoundButton
-      matched={match}
-      active={act}
-      onClick={() => {
-        if (!max && !match) {
-          setActive(!act);
-          onClick(setActive, setMatch);
-        }
-      }}
+      matched={matched}
+      onClick={onClick}
+      active={active}
       {...rest}
     >
       {children}

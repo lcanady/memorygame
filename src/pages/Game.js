@@ -4,7 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Button, RoundButton } from "../components/Buttons";
 import { InfoCard } from "../components/InfoCard";
-import { setGameMap, setScore, toggleMax } from "../data/settingsSlice";
+import {
+  setClock,
+  setGameMap,
+  setPauseClock,
+  setScore,
+  toggleMax,
+} from "../data/settingsSlice";
 
 const Wrapper = styled.div`
   display: flex;
@@ -64,9 +70,12 @@ export default function Game() {
   const grid = useSelector((state) => state.settings.grid);
   const gameMap = useSelector((state) => state.settings.gameMap);
   const score = useSelector((state) => state.settings.score);
+  const max = useSelector((state) => state.settings.max);
+  const clock = useSelector((state) => state.settings.clock);
+  const pauseClock = useSelector((state) => state.settings.pauseClock);
   const dispatch = useDispatch();
   const history = useHistory();
-  const [registry, setRegistry] = useState([]);
+  const [timer, setTimer] = useState();
   const [active, setActive] = useState([]);
 
   /**
@@ -126,34 +135,56 @@ export default function Game() {
   }, [PopulateGrid]);
 
   useEffect(() => {
-    if (active && active.length >= 2) {
-      dispatch(toggleMax());
-      setTimeout(() => {
-        // No match!
-        if (active[0].value !== active[1].value) {
-          active.forEach((button) => button.act(false));
-          setActive([]);
-          return dispatch(toggleMax());
-        }
+    if (active.length === 2) {
+      dispatch(toggleMax(true));
+      dispatch(setScore(score + 1));
 
-        // Match!
-        if (
-          active[0].value === active[1].value &&
-          active[0].idx !== active[1].idx
-        ) {
-          active.forEach((button) => {
-            button.mat(true);
-            button.act(false);
-          });
-          setActive([]);
-          dispatch(toggleMax());
-        } else {
-          setActive([]);
-          dispatch(toggleMax());
-        }
-      }, 1000);
+      const val1 = gameMap.find((_item, idx) => idx === active[0]);
+      const val2 = gameMap.find((_item, idx) => idx === active[1]);
+
+      // No match
+      if (val1.value !== val2.value) {
+        setTimeout(() => {
+          dispatch(toggleMax(false));
+          dispatch(
+            setGameMap(
+              gameMap.map((token, idx) =>
+                active.includes(idx)
+                  ? { ...token, ...{ active: false } }
+                  : token
+              )
+            )
+          );
+        }, 1000);
+        return setActive([]);
+      }
+
+      // match!!
+      if (val1.value === val2.value) {
+        setTimeout(() => {
+          dispatch(toggleMax(false));
+          dispatch(
+            setGameMap(
+              gameMap.map((token, idx) =>
+                active.includes(idx)
+                  ? { ...token, ...{ active: false, matched: true } }
+                  : token
+              )
+            )
+          );
+        }, 1000);
+        return setActive([]);
+      }
     }
-  }, [active, dispatch]);
+  }, [active, dispatch, gameMap, score]);
+
+  useEffect(() => {
+    if (!pauseClock) {
+      const timer = setTimeout(() => dispatch(setClock(clock + 1)), 1000);
+      setTimer(timer);
+      return () => clearTimeout(timer);
+    }
+  }, [clock, dispatch, pauseClock]);
 
   return (
     <Wrapper>
@@ -165,34 +196,51 @@ export default function Game() {
               primary
               variant
               onClick={() => {
-                registry.forEach((button) => {
-                  button.mat(false);
-                  button.act(false);
-                });
                 setActive([]);
-                setTimeout(() => PopulateGrid(), 200);
+                dispatch(setClock(false));
+                dispatch(setClock(0));
+                clearTimeout(timer);
+                dispatch(setPauseClock(false));
+                dispatch(setScore(0));
+                setTimeout(() => PopulateGrid(), 300);
               }}
             >
               restart
             </Button>
-            <Button variant onClick={() => history.push("/")}>
+            <Button
+              variant
+              onClick={() => {
+                dispatch(setClock(0));
+                dispatch(setPauseClock(true));
+                history.push("/");
+              }}
+            >
               New Game
             </Button>
           </TopButtons>
         </Nav>
         <GameContainer>
           {gameMap &&
-            gameMap.length &&
+            gameMap.length > 0 &&
             gameMap.map((item, idx) => {
               return (
                 <RoundButton
                   key={idx}
                   active={item.active}
-                  onClick={(act, mat) => {
-                    dispatch(setScore(score + 1));
-                    const entry = { idx, act, mat, value: item.value };
-                    setRegistry([...new Set([...registry, entry])]);
-                    setActive([...active, entry]);
+                  matched={item.matched}
+                  onClick={() => {
+                    dispatch(
+                      setGameMap(
+                        gameMap.map((token, i) => {
+                          if (i === idx && !max) {
+                            setActive([...new Set([...active, idx])]);
+                            return { ...token, ...{ active: true } };
+                          } else {
+                            return token;
+                          }
+                        })
+                      )
+                    );
                   }}
                 >
                   {item.value}
@@ -201,7 +249,9 @@ export default function Game() {
             })}
         </GameContainer>
         <ScoreContainer>
-          <InfoCard text="Time">1:30</InfoCard>
+          <InfoCard text="Time">
+            {new Date(clock * 1000).toISOString().substr(14, 5)}
+          </InfoCard>
           <InfoCard text="moves">{score}</InfoCard>
         </ScoreContainer>
       </Container>
