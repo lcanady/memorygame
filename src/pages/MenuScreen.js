@@ -46,14 +46,14 @@ function MenuScreen() {
           <Button
             width="256px"
             active={!theme}
-            onClick={() => dispatch(toggleTheme())}
+            onClick={() => dispatch(toggleTheme(false))}
           >
             Numbers
           </Button>
           <Button
             width="256px"
             active={theme}
-            onClick={() => dispatch(toggleTheme())}
+            onClick={() => dispatch(toggleTheme(true))}
           >
             Icons
           </Button>

@@ -1,4 +1,16 @@
 import styled from "@emotion/styled";
+import {
+  Icon1,
+  Icon2,
+  Icon3,
+  Icon4,
+  Icon5,
+  Icon6,
+  Icon7,
+  Icon8,
+} from "./icons";
+
+const Icons = [Icon1, Icon2, Icon3, Icon4, Icon5, Icon6, Icon7, Icon8];
 
 export const Button = styled.button`
   padding: 0 24px;
@@ -48,9 +60,11 @@ export const Button = styled.button`
 `;
 
 export const BaseRoundButton = styled.button`
-  height: ${({ size }) => (size ? size : "118px")};
-  width: ${({ size }) => (size ? size : "118px")};
-
+  height: ${({ grid }) => (grid ? "82px" : "118px")};
+  width: ${({ grid }) => (grid ? "82px" : "118px")};
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 59px;
   outline: none;
   border: none;
@@ -71,6 +85,15 @@ export const BaseRoundButton = styled.button`
     return "rgba(252, 252, 252, 0)";
   }};
 
+  svg {
+    fill: ${({ active, matched }) => {
+      if (active || matched) return "rgba(252, 252, 252, 1)";
+      return "rgba(252, 252, 252, 0)";
+    }};
+
+    transition: fill 0.2s;
+  }
+
   &:hover {
     background-color: ${({ active, matched, theme }) => {
       if (!active && !matched) return theme.colors.hover;
@@ -83,6 +106,7 @@ export function RoundButton({
   matched,
   active,
   idx,
+  icon,
   onClick = () => {},
   ...rest
 }) {
@@ -93,7 +117,11 @@ export function RoundButton({
       active={active}
       {...rest}
     >
-      {children}
+      {icon
+        ? Icons.filter((icon) => icon.name.includes(children)).map(
+            (Icon, idx) => <Icon key={idx} />
+          ) || children
+        : children}
     </BaseRoundButton>
   );
 }

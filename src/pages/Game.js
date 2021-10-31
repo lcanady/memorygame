@@ -10,7 +10,7 @@ import {
   setPauseClock,
   setScore,
   toggleMax,
-} from "../data/settingsSlice";
+} from "../data/GameSlice";
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,8 +38,8 @@ const Container = styled.div`
 const GameContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  width: ${({ size }) => (size ? size : "532px")};
-  height: ${({ size }) => (size ? size : "532px")};
+  width: ${({ grid }) => (grid ? "572px" : "532px")};
+  height: ${({ size }) => (size ? "572px" : "532px")};
   margin: auto;
   flex-wrap: wrap;
 `;
@@ -68,11 +68,12 @@ const ScoreContainer = styled.div`
 
 export default function Game() {
   const grid = useSelector((state) => state.settings.grid);
-  const gameMap = useSelector((state) => state.settings.gameMap);
-  const score = useSelector((state) => state.settings.score);
-  const max = useSelector((state) => state.settings.max);
-  const clock = useSelector((state) => state.settings.clock);
-  const pauseClock = useSelector((state) => state.settings.pauseClock);
+  const gameMap = useSelector((state) => state.game.gameMap);
+  const useIcons = useSelector((state) => state.settings.theme);
+  const score = useSelector((state) => state.game.score);
+  const max = useSelector((state) => state.game.max);
+  const clock = useSelector((state) => state.game.clock);
+  const pauseClock = useSelector((state) => state.game.pauseClock);
   const dispatch = useDispatch();
   const history = useHistory();
   const [timer, setTimer] = useState();
@@ -202,7 +203,7 @@ export default function Game() {
                 clearTimeout(timer);
                 dispatch(setPauseClock(false));
                 dispatch(setScore(0));
-                setTimeout(() => PopulateGrid(), 300);
+                PopulateGrid();
               }}
             >
               restart
@@ -219,13 +220,14 @@ export default function Game() {
             </Button>
           </TopButtons>
         </Nav>
-        <GameContainer>
+        <GameContainer grid={grid}>
           {gameMap &&
             gameMap.length > 0 &&
             gameMap.map((item, idx) => {
               return (
                 <RoundButton
                   key={idx}
+                  grid={grid}
                   active={item.active}
                   matched={item.matched}
                   onClick={() => {
@@ -243,6 +245,7 @@ export default function Game() {
                       )
                     );
                   }}
+                  icon={useIcons}
                 >
                   {item.value}
                 </RoundButton>
