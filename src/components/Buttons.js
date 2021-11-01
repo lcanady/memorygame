@@ -17,7 +17,7 @@ export const Button = styled.button`
   height: ${({ primary, variant }) => (primary && !variant ? "72px" : "52px")};
   border: none;
   outline: none;
-  font-size: 26px;
+  font-size: 20px;
   font-family: "Atkinson Hyperlegible", sans-serif;
   font-weight: bold;
   transition: background-color 0.5s, color 0.2s;

@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Button, ButtonContainer } from "../components/Buttons";
+import { setClock, setScore } from "../data/GameSlice";
 import {
   setPlayers,
   toggleGrid,
@@ -105,6 +106,8 @@ function MenuScreen() {
           width="100%"
           onClick={() => {
             dispatch(toggleStarted());
+            dispatch(setClock(0));
+            dispatch(setScore(0));
             history.push("/game");
           }}
         >

@@ -16,6 +16,7 @@ const Note = styled.p`
   text-align: center;
   transition: opacity 0.2s;
   opacity: ${({ active }) => (active ? 1 : 0)};
+  display: ${({ narrow }) => (narrow ? "none" : "block")};
 `;
 
 const InfoContainer = styled.div`
@@ -45,7 +46,14 @@ const Body = styled.div`
     active ? theme.colors.white : theme.colors.black};
 `;
 
-export function InfoCard({ text = "", fullwidth, active, children, ...rest }) {
+export function InfoCard({
+  text = "",
+  narrow,
+  fullwidth,
+  active,
+  children,
+  ...rest
+}) {
   return (
     <InfoWrapper fullwidth={fullwidth} {...rest}>
       <Arrow
@@ -60,7 +68,9 @@ export function InfoCard({ text = "", fullwidth, active, children, ...rest }) {
         <Label active={active}>{text}</Label>
         <Body active={active}>{children}</Body>
       </InfoContainer>
-      <Note active={active}>Current Turn</Note>
+      <Note active={active} narrow={narrow}>
+        Current Turn
+      </Note>
     </InfoWrapper>
   );
 }

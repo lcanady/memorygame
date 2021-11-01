@@ -1,9 +1,11 @@
+import { useTheme } from "@emotion/react";
 import styled from "@emotion/styled";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { Button, RoundButton } from "../components/Buttons";
 import { InfoCard } from "../components/InfoCard";
+import { Modal } from "../components/Modal";
 import {
   setClock,
   setGameMap,
@@ -49,7 +51,7 @@ const Nav = styled.div`
   width: 100%;
 `;
 const Title = styled.h1`
-  margin-right: auto;
+  ${({ grow }) => grow && { marginRight: "auto" }}
 `;
 const TopButtons = styled.div`
   Button {
@@ -78,6 +80,10 @@ export default function Game() {
   const history = useHistory();
   const [timer, setTimer] = useState();
   const [active, setActive] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [matches, setMatches] = useState(1);
+
+  const theme = useTheme();
 
   /**
    * Shuffle a 2D array.
@@ -162,6 +168,7 @@ export default function Game() {
 
       // match!!
       if (val1.value === val2.value) {
+        setMatches(matches + 1);
         setTimeout(() => {
           dispatch(toggleMax(false));
           dispatch(
@@ -177,7 +184,15 @@ export default function Game() {
         return setActive([]);
       }
     }
-  }, [active, dispatch, gameMap, score]);
+  }, [active, dispatch, gameMap, grid, matches, score]);
+
+  useEffect(() => {
+    const rows = grid ? 6 : 4;
+    if (matches >= (rows * rows) / 2) {
+      dispatch(setPauseClock(true));
+      setModalVisible(true);
+    }
+  });
 
   useEffect(() => {
     if (!pauseClock) {
@@ -189,9 +204,67 @@ export default function Game() {
 
   return (
     <Wrapper>
+      <Modal visible={modalVisible} onClickBG={() => setModalVisible(false)}>
+        <Title>You Did It!!</Title>
+        <p
+          style={{
+            marginTop: " 32px",
+            marginBottom: "16px",
+            color: theme.colors.hover,
+          }}
+        >
+          Game over! Here's how well you did...
+        </p>
+        <InfoCard text="Time Elapsed" width="100%" narrow>
+          {new Date(clock * 1000).toISOString().substr(14, 5)}
+        </InfoCard>
+        <InfoCard text="Total Moves" width="100%" narrow>
+          {score}
+        </InfoCard>
+        <div
+          style={{
+            paddingTop: "32px",
+            justifyContent: "space-between",
+            display: "flex",
+            width: " 100%",
+          }}
+        >
+          <Button
+            width="45%"
+            primary
+            variant
+            onClick={() => {
+              setActive([]);
+              dispatch(setClock(false));
+              dispatch(setClock(0));
+              clearTimeout(timer);
+              dispatch(setPauseClock(false));
+              dispatch(setScore(0));
+              setMatches(0);
+              PopulateGrid();
+              setModalVisible(false);
+            }}
+          >
+            Restart
+          </Button>
+          <Button
+            width="45%"
+            secondary
+            variant
+            onClick={() => {
+              dispatch(setPauseClock(true));
+              setMatches(0);
+              setModalVisible(false);
+              history.push("/");
+            }}
+          >
+            Setup New Game
+          </Button>
+        </div>
+      </Modal>
       <Container>
         <Nav>
-          <Title>memory</Title>
+          <Title grow>memory</Title>
           <TopButtons>
             <Button
               primary
@@ -200,6 +273,7 @@ export default function Game() {
                 setActive([]);
                 dispatch(setClock(false));
                 dispatch(setClock(0));
+                setMatches(0);
                 clearTimeout(timer);
                 dispatch(setPauseClock(false));
                 dispatch(setScore(0));
@@ -213,6 +287,7 @@ export default function Game() {
               onClick={() => {
                 dispatch(setClock(0));
                 dispatch(setPauseClock(true));
+                setMatches(0);
                 history.push("/");
               }}
             >
