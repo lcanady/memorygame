@@ -192,7 +192,7 @@ export default function Game() {
       dispatch(setPauseClock(true));
       setModalVisible(true);
     }
-  });
+  }, [setModalVisible, dispatch, grid, matches]);
 
   useEffect(() => {
     if (!pauseClock) {
