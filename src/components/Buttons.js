@@ -1,16 +1,4 @@
 import styled from "@emotion/styled";
-import {
-  Icon1,
-  Icon2,
-  Icon3,
-  Icon4,
-  Icon5,
-  Icon6,
-  Icon7,
-  Icon8,
-} from "./icons";
-
-const Icons = [Icon1, Icon2, Icon3, Icon4, Icon5, Icon6, Icon7, Icon8];
 
 export const Button = styled.button`
   padding: 0 24px;
@@ -85,15 +73,6 @@ export const BaseRoundButton = styled.button`
     return "rgba(252, 252, 252, 0)";
   }};
 
-  svg {
-    fill: ${({ active, matched }) => {
-      if (active || matched) return "rgba(252, 252, 252, 1)";
-      return "rgba(252, 252, 252, 0)";
-    }};
-
-    transition: fill 0.2s;
-  }
-
   &:hover {
     background-color: ${({ active, matched, theme }) => {
       if (!active && !matched) return theme.colors.hover;
@@ -107,6 +86,8 @@ export function RoundButton({
   active,
   idx,
   icon,
+  size,
+  grid,
   onClick = () => {},
   ...rest
 }) {
@@ -115,13 +96,23 @@ export function RoundButton({
       matched={matched}
       onClick={onClick}
       active={active}
+      grid={grid}
       {...rest}
     >
-      {icon
-        ? Icons.filter((icon) => icon.name.includes(children)).map(
-            (Icon, idx) => <Icon key={idx} />
-          ) || children
-        : children}
+      {icon ? (
+        <img
+          src={`/memorygame/${children}.png`}
+          style={{
+            maxWidth: grid ? "48px" : "56px",
+            height: "auto",
+            opacity: matched || active ? 1 : 0,
+            transition: "opacity .2s",
+          }}
+          alt="game piece"
+        />
+      ) : (
+        children
+      )}
     </BaseRoundButton>
   );
 }

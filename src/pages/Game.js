@@ -13,6 +13,8 @@ import {
   setScore,
   toggleMax,
 } from "../data/GameSlice";
+import logo from "../assets/digibear.png";
+import github from "../assets/github.png";
 
 const Wrapper = styled.div`
   display: flex;
@@ -40,6 +42,7 @@ const Container = styled.div`
 const GameContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: ${({ grid }) => (grid ? "572px" : "532px")};
   height: ${({ size }) => (size ? "572px" : "532px")};
   margin: auto;
@@ -54,7 +57,13 @@ const Title = styled.h1`
   ${({ grow }) => grow && { marginRight: "auto" }}
 `;
 const TopButtons = styled.div`
+  display: flex;
+
   Button {
+    margin-left: 24px;
+  }
+  img {
+    cursor: pointer;
     margin-left: 24px;
   }
 `;
@@ -81,7 +90,7 @@ export default function Game() {
   const [timer, setTimer] = useState();
   const [active, setActive] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [matches, setMatches] = useState(1);
+  const [matches, setMatches] = useState(0);
 
   const theme = useTheme();
 
@@ -188,7 +197,7 @@ export default function Game() {
 
   useEffect(() => {
     const rows = grid ? 6 : 4;
-    if (matches >= (rows * rows) / 2) {
+    if (matches === (rows * rows) / 2) {
       dispatch(setPauseClock(true));
       setModalVisible(true);
     }
@@ -288,11 +297,24 @@ export default function Game() {
                 dispatch(setClock(0));
                 dispatch(setPauseClock(true));
                 setMatches(0);
-                history.push("/");
+                dispatch(setScore(0));
+                setTimeout(() => history.push("/"), 400);
               }}
             >
               New Game
             </Button>
+            <img
+              src={github}
+              alt="github"
+              onClick={() =>
+                (window.location.href = "https://github.com/lcanady/memorygame")
+              }
+            />
+            <img
+              src={logo}
+              alt="logo"
+              onClick={() => (window.location.href = "https://digibear.io")}
+            />
           </TopButtons>
         </Nav>
         <GameContainer grid={grid}>

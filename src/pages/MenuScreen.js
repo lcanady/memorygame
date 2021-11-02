@@ -33,6 +33,13 @@ const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
 `;
 
+const Home = styled.p`
+  font-size: 24px;
+  margin-top: 32px;
+  text-decoration: underline;
+  color: ${({ theme }) => theme.colors.secondary};
+`;
+
 function MenuScreen() {
   const theme = useSelector((state) => state.settings.theme);
   const grid = useSelector((state) => state.settings.grid);
@@ -66,24 +73,6 @@ function MenuScreen() {
           >
             1
           </Button>
-          <Button
-            active={players === 2}
-            onClick={() => dispatch(setPlayers(2))}
-          >
-            2
-          </Button>
-          <Button
-            active={players === 3}
-            onClick={() => dispatch(setPlayers(3))}
-          >
-            3
-          </Button>
-          <Button
-            active={players === 4}
-            onClick={() => dispatch(setPlayers(4))}
-          >
-            4
-          </Button>
         </ButtonContainer>
         <ButtonContainer text="Grid Size">
           <Button
@@ -114,6 +103,16 @@ function MenuScreen() {
           Start Game
         </Button>
       </Container>
+      <Home onClick={() => (window.location.href = "https://digibear.io/")}>
+        Home
+      </Home>
+      <Home
+        onClick={() =>
+          (window.location.href = "https://github.com/lcanady/memorygame")
+        }
+      >
+        Github
+      </Home>
     </Wrapper>
   );
 }

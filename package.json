@@ -4,9 +4,13 @@
   "private": true,
   "author": "Lemuel L. Canady, Jr.",
   "description": "A Javascript based multipalyer memory-match game!",
+  "homepage": "https://digibear.io/memorygame",
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.16",
     "@reduxjs/toolkit": "^1.6.2",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
